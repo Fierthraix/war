@@ -78,19 +78,20 @@ impl WarGame {
         if self.game_over { return; }
         // Decks aren't empty, we check for this at the end of every turn and set `game_over`
         let cards = (self.player1.draw(), self.player2.draw());
-        self.turn_inner(cards, vec![]);
+        self.turn_inner(cards, LinkedList::new());
     }
-    fn turn_inner(&mut self, cards: (WarCard, WarCard), mut for_grabs: Vec<WarCard>) {
+    fn turn_inner(&mut self, cards: (WarCard, WarCard), mut for_grabs: LinkedList<WarCard>) {
         let (card1, card2) = cards;
         if card1 > card2 {
             // Player 1 gets the cards
             self.player1.add(card1);
             self.player1.add(card2);
-            self.player1.append(for_grabs)
+            self.player1.append(&mut for_grabs)
         } else if card2 > card1 {
             // Player 2 wins the round
             self.player2.add(card1);
             self.player2.add(card2);
+            self.player1.append(&mut for_grabs)
         } else {
             // WAAAGGHH!
             if self.player1.deck.len() < 4 || self.player2.deck.len() < 4 {
@@ -98,12 +99,13 @@ impl WarGame {
                 self.game_over = true;
                 return;
             }
+            // Add the current cards to `for_grabs`
+            for_grabs.push_back(card1);
+            for_grabs.push_back(card2);
             // Draw three cards from each player
             for _ in 0..3 {
-                for_grabs.push(self.player1.draw());
-            }
-            for _ in 0..3 {
-                for_grabs.push(self.player2.draw());
+                for_grabs.push_back(self.player1.draw());
+                for_grabs.push_back(self.player2.draw());
             }
             // Repeat the turn
             let cards = (self.player1.draw(), self.player2.draw());
@@ -130,7 +132,7 @@ impl Player {
     fn add(&mut self, card: WarCard) {
         self.deck.push_back(card)
     }
-    fn append(&mut self, cards: impl IntoIterator<Item = WarCard>) {
-        cards.into_iter().for_each(|card| self.deck.push_back(card));
+    fn append(&mut self, cards: &mut LinkedList<WarCard>) {
+        self.deck.append(cards);
     }
 }
