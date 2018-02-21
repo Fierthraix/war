@@ -74,6 +74,42 @@ impl WarGame {
             game_over: false,
         }
     }
+    pub fn turn(&mut self) {
+        if self.game_over { return; }
+        // Decks aren't empty, we check for this at the end of every turn and set `game_over`
+        let cards = (self.player1.draw(), self.player2.draw());
+        self.turn_inner(cards, vec![]);
+    }
+    fn turn_inner(&mut self, cards: (WarCard, WarCard), mut for_grabs: Vec<WarCard>) {
+        let (card1, card2) = cards;
+        if card1 > card2 {
+            // Player 1 gets the cards
+            self.player1.add(card1);
+            self.player1.add(card2);
+            self.player1.append(for_grabs)
+        } else if card2 > card1 {
+            // Player 2 wins the round
+            self.player2.add(card1);
+            self.player2.add(card2);
+        } else {
+            // WAAAGGHH!
+            if self.player1.deck.len() < 4 || self.player2.deck.len() < 4 {
+                // One of the players doesn't have enough cards
+                self.game_over = true;
+                return;
+            }
+            // Draw three cards from each player
+            for _ in 0..3 {
+                for_grabs.push(self.player1.draw());
+            }
+            for _ in 0..3 {
+                for_grabs.push(self.player2.draw());
+            }
+            // Repeat the turn
+            let cards = (self.player1.draw(), self.player2.draw());
+            self.turn_inner(cards, for_grabs);
+        }
+    }
 }
 
 struct Player {
@@ -88,4 +124,13 @@ impl Player {
                 deck: deck.iter().map(|card| (*card).clone().into()).collect::<LinkedList<_>>()
             }
         }
+    fn draw(&mut self) -> WarCard {
+        self.deck.pop_front().unwrap()
+    }
+    fn add(&mut self, card: WarCard) {
+        self.deck.push_back(card)
+    }
+    fn append(&mut self, cards: impl IntoIterator<Item = WarCard>) {
+        cards.into_iter().for_each(|card| self.deck.push_back(card));
+    }
 }
