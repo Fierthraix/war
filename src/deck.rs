@@ -8,7 +8,29 @@ pub struct Card {
     pub val: CardValue,
 }
 
-#[derive(Clone, PartialEq)]
+use std::fmt;
+impl fmt::Debug for Card {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let suit = match self.suit {
+            CardSuit::Spades => "Spades",
+            CardSuit::Hearts => "Hearts",
+            CardSuit::Clubs => "Clubs",
+            CardSuit::Diamonds => "Diamonds",
+        };
+        let val = match self.val {
+            CardValue::King => "King".to_string(),
+            CardValue::Queen => "Queen".to_string(),
+            CardValue::Jack => "Jack".to_string(),
+            CardValue::Ace => "Ace".to_string(),
+            CardValue::Num(n) => {
+                format!("{}", n)
+            },
+        };
+        write!(f, "{} of {}", val, suit)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum CardSuit {
     Spades,
     Diamonds,
@@ -16,7 +38,7 @@ pub enum CardSuit {
     Hearts,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum CardValue {
     King,
     Queen,
