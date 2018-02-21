@@ -54,3 +54,38 @@ impl PartialOrd<WarCard> for WarCard {
         }
     }
 }
+
+pub struct WarGame {
+    player1: Player,
+    player2: Player,
+    pub game_over: bool,
+}
+
+impl WarGame {
+    pub fn new() -> Self {
+        let mut deck = Deck::default();
+        deck.shuffle();
+
+        let (deck1, deck2) = deck.split();
+
+        WarGame {
+            player1: Player::new(&deck1),
+            player2: Player::new(&deck2),
+            game_over: false,
+        }
+    }
+}
+
+struct Player {
+    deck: LinkedList<WarCard>,
+}
+
+impl Player {
+    fn new<T>(deck: &[T]) -> Self
+        where T: Into<WarCard> + Clone
+        {
+            Player {
+                deck: deck.iter().map(|card| (*card).clone().into()).collect::<LinkedList<_>>()
+            }
+        }
+}
