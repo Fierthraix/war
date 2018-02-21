@@ -56,7 +56,7 @@ impl PartialOrd<WarCard> for WarCard {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct WarGame {
     player1: Player,
     player2: Player,
@@ -118,7 +118,7 @@ impl WarGame {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 struct Player {
     deck: LinkedList<WarCard>,
 }
@@ -131,7 +131,20 @@ impl Player {
                 deck: deck.iter().map(|card| (*card).clone().into()).collect::<LinkedList<_>>()
             }
         }
-    fn from_list(cards: &str) -> Self {
+    fn draw(&mut self) -> WarCard {
+        self.deck.pop_front().unwrap()
+    }
+    fn add(&mut self, card: WarCard) {
+        self.deck.push_back(card)
+    }
+    fn append(&mut self, cards: &mut LinkedList<WarCard>) {
+        self.deck.append(cards);
+    }
+}
+
+#[test]
+fn test_turns_work() {
+    fn from_list(cards: &str) -> Player {
         let mut deck = LinkedList::new();
         for card in cards.split(", ") {
             let (val, suit) = card.split_at(card.len() - 1);
@@ -156,93 +169,80 @@ impl Player {
         }
         Player{ deck: deck }
     }
-    fn draw(&mut self) -> WarCard {
-        self.deck.pop_front().unwrap()
-    }
-    fn add(&mut self, card: WarCard) {
-        self.deck.push_back(card)
-    }
-    fn append(&mut self, cards: &mut LinkedList<WarCard>) {
-        self.deck.append(cards);
-    }
-}
-
-#[test]
-fn test_turns_work() {
     let mut game = WarGame {
-        player1: Player::from_list("ks, kh, 2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d"),
-        player2: Player::from_list("9c, as, 7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d"),
+        player1: from_list("ks, kh, 2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d"),
+        player2: from_list("9c, as, 7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d"),
         game_over: false,
     };
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("kh, 2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
-        player2: Player::from_list("as, 7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d"),
-        game_over: false,
-    };
-    assert_eq!(game, result);
-
-    game.turn();
-    let result = WarGame {
-        player1: Player::from_list("2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
-        player2: Player::from_list("7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as"),
+        player1: from_list("kh, 2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
+        player2: from_list("as, 7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
-        player2: Player::from_list("qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c"),
+        player1: from_list("2s, js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
+        player2: from_list("7c, qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
-        player2: Player::from_list("6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs"),
+        player1: from_list("js, 6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
+        player2: from_list("qs, 6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("3c, 5d, kc, 10h, 7d, ks, 9c, 6h, 6d, 3h, 8d, 4s, 3d, 8h, 4c, 9d, ah"),
-        player2: Player::from_list("4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs"),
+        player1: from_list("6h, 3h, 4s, 8h, 9d, 3c, 5d, kc, 10h, 7d, ks, 9c"),
+        player2: from_list("6d, 8d, 3d, 4c, ah, 4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("5d, kc, 10h, 7d, ks, 9c, 6h, 6d, 3h, 8d, 4s, 3d, 8h, 4c, 9d, ah"),
-        player2: Player::from_list("5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs, 3c, 4h"),
+        player1: from_list("3c, 5d, kc, 10h, 7d, ks, 9c, 6h, 6d, 3h, 8d, 4s, 3d, 8h, 4c, 9d, ah"),
+        player2: from_list("4h, 5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("8d, 4s, 3d, 8h, 4c, 9d, ah"),
-        player2: Player::from_list("qs, 3c, 4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js"),
+        player1: from_list("5d, kc, 10h, 7d, ks, 9c, 6h, 6d, 3h, 8d, 4s, 3d, 8h, 4c, 9d, ah"),
+        player2: from_list("5c, qc, 10c, 2d, kh, as, 2s, 7c, js, qs, 3c, 4h"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("4s, 3d, 8h, 4c, 9d, ah"),
-        player2: Player::from_list("3c, 4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js, 8d, qs"),
+        player1: from_list("8d, 4s, 3d, 8h, 4c, 9d, ah"),
+        player2: from_list("qs, 3c, 4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js"),
         game_over: false,
     };
     assert_eq!(game, result);
 
     game.turn();
     let result = WarGame {
-        player1: Player::from_list("3d, 8h, 4c, 9d, ah, 4s, 3c"),
-        player2: Player::from_list("4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js, 8d, qs"),
+        player1: from_list("4s, 3d, 8h, 4c, 9d, ah"),
+        player2: from_list("3c, 4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js, 8d, qs"),
+        game_over: false,
+    };
+    assert_eq!(game, result);
+
+    game.turn();
+    let result = WarGame {
+        player1: from_list("3d, 8h, 4c, 9d, ah, 4s, 3c"),
+        player2: from_list("4h, 5d, 5c, kc, qc, 10h, 10c, 7d, 2d, ks, kh, 9c, as, 6h, 2s, 6d, 7c, 3h, js, 8d, qs"),
         game_over: false,
     };
     assert_eq!(game, result);
