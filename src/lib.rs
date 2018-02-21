@@ -1,28 +1,18 @@
-#[derive(PartialEq)]
-pub struct Card {
-    suit: CardSuit,
-    val: CardValue,
-}
+#![feature(universal_impl_trait)]
 
-#[derive(PartialEq)]
-pub enum CardSuit {
-    Spades,
-    Diamonds,
-    Clubs,
-    Hearts,
-}
+pub mod deck;
 
-#[derive(PartialEq)]
-pub enum CardValue {
-    King,
-    Queen,
-    Jack,
-    Num(u8),
-    Ace
-}
+use deck::*;
+use std::collections::LinkedList;
 
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct WarCard(Card);
+
+impl From<Card> for WarCard {
+    fn from(card: Card) -> Self {
+        WarCard(card)
+    }
+}
 
 use std::cmp::Ordering::{self, Equal, Greater, Less};
 
