@@ -5,7 +5,7 @@ pub mod deck;
 use deck::*;
 use std::collections::LinkedList;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct WarCard(Card);
 
 impl From<Card> for WarCard {
@@ -56,7 +56,7 @@ impl PartialOrd<WarCard> for WarCard {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct WarGame {
     player1: Player,
     player2: Player,
@@ -118,7 +118,7 @@ impl WarGame {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Player {
     deck: LinkedList<WarCard>,
 }

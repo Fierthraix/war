@@ -2,7 +2,7 @@ extern crate rand;
 
 use self::rand::{thread_rng, Rng};
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Eq, Hash, PartialEq)]
 pub struct Card {
     pub suit: CardSuit,
     pub val: CardValue,
@@ -30,7 +30,7 @@ impl fmt::Debug for Card {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum CardSuit {
     Spades,
     Diamonds,
@@ -38,7 +38,7 @@ pub enum CardSuit {
     Hearts,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum CardValue {
     King,
     Queen,
