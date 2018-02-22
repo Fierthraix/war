@@ -6,7 +6,7 @@ use rayon::prelude::*;
 
 use std::collections::HashSet;
 
-const NUM_ROUNDS: usize = 100_000;
+const NUM_ROUNDS: usize = 1_000_000;
 const MAX_TURNS: usize = 100_000;
 
 #[derive(Clone)]
@@ -57,9 +57,9 @@ fn main() {
             None
         }
     }).collect::<Vec<usize>>();
-    println!("{}/ {} ({}%) repeated after an average of {} turns",
-    num_repeats.len(), MAX_TURNS,
-    num_repeats.len() as f64 / MAX_TURNS as f64 * 100.,
+    println!("{}/{} ({}%) repeated after an average of {} turns",
+    num_repeats.len(), NUM_ROUNDS,
+    num_repeats.len() as f64 / NUM_ROUNDS as f64 * 100.,
     num_repeats.iter().map(|&n| n).sum::<usize>() / num_repeats.len());
 
 
@@ -71,8 +71,8 @@ fn main() {
             0
         }
     }).sum::<usize>();
-    println!("{} / {} ({}%) of games didn't finish after {} rounds",
-    num_unfinished, MAX_TURNS,
-    num_unfinished as f64 / MAX_TURNS as f64 * 100.,
+    println!("{}/{} ({}%) of games didn't finish after {} turns",
+    num_unfinished, NUM_ROUNDS,
+    num_unfinished as f64 / NUM_ROUNDS as f64 * 100.,
     MAX_TURNS);
 }
