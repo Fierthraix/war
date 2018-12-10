@@ -1,5 +1,3 @@
-#![feature(universal_impl_trait)]
-
 pub mod deck;
 
 use deck::*;

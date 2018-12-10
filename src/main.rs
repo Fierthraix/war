@@ -47,7 +47,7 @@ fn main() {
         }
     }).collect::<Vec<usize>>();
     println!("Average num of turns for games that finished: {}",
-             average_turns.iter().map(|&n| n).sum::<usize>() / average_turns.len());
+             average_turns.iter().cloned().sum::<usize>() / average_turns.len());
 
     // Get how many games repeated
     let num_repeats = totals.iter().filter_map(|state| {
@@ -60,7 +60,7 @@ fn main() {
     println!("{}/{} ({}%) repeated after an average of {} turns",
     num_repeats.len(), NUM_ROUNDS,
     num_repeats.len() as f64 / NUM_ROUNDS as f64 * 100.,
-    num_repeats.iter().map(|&n| n).sum::<usize>() / num_repeats.len());
+    num_repeats.iter().cloned().sum::<usize>() / num_repeats.len());
 
 
     // Get how many didn't end yet
